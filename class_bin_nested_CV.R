@@ -3,39 +3,17 @@
 
 ###############---------------###############
 
-# pacchetti utili per i modelli di classificazione.
-# Se nella funzione clbin_nestkfold si vogliono aggiungere
-# altri modelli bisogna inserire qui i pacchetti che contengono
-# i modelli desiderati.
+# useful packages for the classification models.
+# If in the clbin_nestkfold function you want to add
+# more models, you must insert here the packages that contain
+# the desired models.
 
 lapply(c('caret','ranger','glmnet','e1071'), 
        FUN = function(x) { do.call("require", list(x)) })
 
 
-
-# funzione per applicare un modello di classificazione binaria a proprio piacimento,
-# con una stima dell'errore di previsione tramite cross validation
-# e una selezione automatica degli iperparametri del modello
-# tramite una nested cross validation.
-# input: 
-#     - data = tutto il dataset, con la risposta (binaria) in prima colonna
-#     - tipo = modello con il quale si vogliono effettuare le previsioni.
-#              qui ho messo la RF, l'SVM e il GLM binomiale con penalizzazione elastic net (default),
-#              ma la funzione è facilmente customizzabile per
-#              aggiungere tutti i modelli (presenti in caret) desiderati
-#     - kfold = numero di fold nella CV
-#     - nest_kfold = numero di fold nella nested CV
-#     - conf_matr = se vuole che ritorni anche la confusion matrix oltre all'accuracy
-#     - seme = il seed da settare per avere risultati replicabili
-# output:
-#     - accuracy
-#     - confusion matrix se si vuole (TRUE di default)
-
-# In aggiunta la funzione stampa a video i progressi tramite una barra di caricamento.
-
-
 clbin_nestkfold <- function(data, tipo = 'elasticnet', kfold = 10, nest_kfold = 10, conf_matr = TRUE, seme = 910, ...){
-  # 'data' deve avere la risposta come prima colonna
+  # 'data' must have the answer as the first column
   tipo <- tolower(tipo)
   set.seed(seme)
   data <- data[sample(1:NROW(data)),]
@@ -78,26 +56,11 @@ clbin_nestkfold <- function(data, tipo = 'elasticnet', kfold = 10, nest_kfold = 
   if(conf_matr){ return(list(conf_matr = conf_mat$table, accuracy = accur)) }
   else{ return(list(accuracy = accur)) }}
 
-# se il numero di predittori del dataset è minore del numero di fold della nested CV (nest_kfold),
-# quando si utilizza la RF viene stampato un messaggio di avviso
-# che non sono stati utilizzati nest_kfold valori unici per l'iperparametro mtry,
-# ma che invece vengono troncati al numero massimo possibile, ovvero 
-# che verranno testati come valori per mtry solo quelli possibili (da uno al numero totale di predittori).
+# if the number of predictors in the dataset is less than the number of folds of the nested CV (nest_kfold),
+# when using RF a warning message is printed, saying that only the possible values (< nest_kfold)
+# for the mtry hyperparameter will be tested.
 
-
-##########----------##########
-
-# esempio di utilizzo su iris (con solo le due classi 'versicolor' e 'virginica')
-
-# db <- data.frame(y=droplevels(as.factor(iris[iris$Species != 'setosa',5])),
-#                  iris[iris$Species != 'setosa',-5])
-# 
-# clbin_nestkfold(db,'elasticnet')
-# clbin_nestkfold(db,'rf')
-# clbin_nestkfold(db,'svm')
-
-
-
+###############---------------###############
 
 
 
