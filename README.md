@@ -13,6 +13,6 @@ In output:
 - the model accuracy
 - the confusion matrix if desired (TRUE by default).
 
-In addition, the function prints progress on the screen via a loading bar.
+In addition, the function prints the progresses of the function via a loading bar.
 
 
